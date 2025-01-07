@@ -1,29 +1,22 @@
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
-const string connectionUri =
-    "mongodb+srv://eliott:passwordBarStock@clusterbarstock.q2bv2.mongodb.net/?retryWrites=true&w=majority&appName=ClusterBarStock";
+var builder = WebApplication.CreateBuilder(args);
 
-var settings = MongoClientSettings.FromConnectionString(connectionUri);
+// Ajout des services nécessaires, comme les contrôleurs
+builder.Services.AddControllers();
 
-// Set the ServerApi field of the settings object to set the version of the Stable API on the client
-settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+// Ajout du service personnalisé pour MongoDB
+builder.Services.AddSingleton<MongoDBService>();
 
-// Create a new client and connect to the server
-var client = new MongoClient(settings);
+var app = builder.Build();
 
-var collection = client.GetDatabase("Calabar").GetCollection<BsonDocument>("StockBiere");
-var filter = Builders<BsonDocument>.Filter.Eq("nom", "Biere1");
-var document = collection.Find(filter).First();
-
-// Send a ping to confirm a successful connection
-try
+// Configuration du pipeline de middleware
+app.UseRouting();
+app.UseEndpoints(endpoints =>
 {
-    var result = client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-    Console.WriteLine("Pinged your deployment. You successfully connected to MongoDB!");
-}
-catch (Exception ex)
-{
-    Console.WriteLine(ex);
-}
-Console.WriteLine(document);
+    endpoints.MapControllers(); // Configure les routes pour les contrôleurs
+});
+
+// Lancer l'application
+app.Run("http://localhost:5000");

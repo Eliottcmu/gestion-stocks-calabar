@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 
-[Route("api/[controller]")]
+[Route("api/stock")]
 [ApiController]
 public class StocksController : ControllerBase
 {
@@ -12,18 +12,85 @@ public class StocksController : ControllerBase
         _mongoDBService = mongoDBService;
     }
 
+    //GET :
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult<IEnumerable<Beers>>> GetBeers()
     {
-        var stocks = _mongoDBService.GetCollection<Stock>("Stocks").Find(_ => true).ToList();
-        return Ok(stocks);
+        Console.WriteLine("test");
+        try
+        {
+            var beers = _mongoDBService.GetCollection<Beers>("Beers").Find(_ => true).ToList();
+            Console.WriteLine(beers);
+            return Ok(beers);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
+    // POST:
     [HttpPost]
-    public IActionResult Create(Stock stock)
+    public async Task<ActionResult<Beers>> PostBeer(Beers beer)
     {
-        var collection = _mongoDBService.GetCollection<Stock>("Stocks");
-        collection.InsertOne(stock);
-        return CreatedAtAction(nameof(Get), new { id = stock.Id }, stock);
+        if (beer == null || string.IsNullOrEmpty(beer.name))
+        {
+            return BadRequest("Invalid beer data.");
+        }
+
+        var collection = _mongoDBService.GetCollection<Beers>("Beers");
+        collection.InsertOne(beer);
+
+        return CreatedAtAction(nameof(GetBeers), new { id = beer.id }, beer);
+    }
+
+    // PUT:
+    [HttpPut]
+    public async Task<ActionResult<Beers>> PutBeer(Beers beer)
+    {
+        if (beer == null || string.IsNullOrEmpty(beer.id))
+        {
+            return BadRequest("Invalid beer data.");
+        }
+
+        var collection = _mongoDBService.GetCollection<Beers>("Beers");
+        collection.ReplaceOne(b => b.id == beer.id, beer);
+
+        return Ok(beer);
+    }
+
+    // DELETE:
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteBeer(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest("Invalid beer id.");
+        }
+
+        var collection = _mongoDBService.GetCollection<Beers>("Beers");
+        collection.DeleteOne(b => b.id == id);
+
+        return NoContent();
+    }
+
+    // GET: /id
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Beers>> GetBeer(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest("Invalid beer id.");
+        }
+
+        var collection = _mongoDBService.GetCollection<Beers>("Beers");
+        var beer = collection.Find(b => b.id == id).FirstOrDefault();
+
+        if (beer == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(beer);
     }
 }
