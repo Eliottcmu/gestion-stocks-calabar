@@ -7,6 +7,7 @@ import Statistiques from './pages/Statistiques';
 import Ventes from './pages/Ventes';
 import Tresorerie from './pages/Tresorerie';
 import NavBar from './components/NavBar/NavBar';
+import Profile from './pages/Profile';
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/statistiques" element={<Statistiques setPage={setPage} />} />
         <Route path="/ventes" element={<Ventes setPage={setPage} />} />
         <Route path="/tresorerie" element={<Tresorerie setPage={setPage} />} />
+        <Route path="/profile" element={<Profile setPage={setPage} />} />
       </Routes>
     </BrowserRouter>
   );
