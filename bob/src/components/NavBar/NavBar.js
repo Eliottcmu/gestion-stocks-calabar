@@ -1,18 +1,33 @@
 import React from 'react';
-import NavLink from '../NavLink/NavLink';
+import { Link } from 'react-router-dom';
+import { FaHome, FaBoxes, FaChartBar, FaMoneyBillWave, FaShoppingCart } from 'react-icons/fa';
 import './NavBar.css';
 
-function NavBar({ setPage }) {
+function NavBar() {
     return (
         <nav className="navbar">
-            {/* <img src='/img/Logo Blanc.png' id="logo"></img> */}
-            <NavLink onClick={() => setPage('Home')} text="Accueil" />
-            <NavLink onClick={() => setPage('Stock')} text="Stocks" />
-            <NavLink onClick={() => setPage('Statistiques')} text="Statistiques" />
-            <NavLink onClick={() => setPage('Tresorerie')} text="Trésorerie" />
-            <NavLink onClick={() => setPage('Ventes')} text="Ventes" />
-
+            <Link to="/" className="navlink">
+                <FaHome className="navlink-icon" />
+                Accueil
+            </Link>
+            <Link to="/stock" className="navlink">
+                <FaBoxes className="navlink-icon" />
+                Stocks
+            </Link>
+            <Link to="/statistiques" className="navlink">
+                <FaChartBar className="navlink-icon" />
+                Statistiques
+            </Link>
+            <Link to="/tresorerie" className="navlink">
+                <FaMoneyBillWave className="navlink-icon" />
+                Trésorerie
+            </Link>
+            <Link to="/ventes" className="navlink">
+                <FaShoppingCart className="navlink-icon" />
+                Ventes
+            </Link>
         </nav>
     );
 }
+
 export default NavBar;

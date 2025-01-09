@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
+import React from 'react'
 import Home from './pages/Home';
 import Stock from './pages/Stock';
 import Statistiques from './pages/Statistiques';
