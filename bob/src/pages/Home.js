@@ -1,34 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
+import './Home.css';
+import { useNavigate } from 'react-router-dom';
 
 function Home({ setPage }) {
-    // const [events] = useState([
-    //     { title: 'Calabar', description: 'Les Ventes du Calabar' },
-    // ]);
-
-    // const handleAddEvent = (newEvent) => {
-    //     setEvents([events, newEvent]);
-    // };
-
+    const navigate = useNavigate();
     return (
         <div className="home-container">
-            <header>
+            <header className="header">
+                <h1>Accueil</h1>
+                {/* <button className="back-button">🔙</button>
+                <button className="notification-button">🔔</button> */}
             </header>
             <main>
-                <h1 > Bienvenue sur la page d'accueil</h1>
-                <div className="home-main" >
-                    <div className="button-container">
-                        <div className="bouton-en-colonne">
-                            {/* <button onClick={() => setPage('Stocks')} className="nav-button" id="stockage">Stockage</button>
-                            <button onClick={() => setPage('Tresorerie')} className="nav-button" id="tresorerie">Trésorerie</button> */}
-                        </div>
-                        <div className="button-home">
-                            {/* <button onClick={() => setPage('Statistiques')} className="nav-button" id="statistiques">Statistiques</button> */}
-                        </div>
-                    </div>
-                    {/* <Evenement events={events} onAddEvent={handleAddEvent} setPage={setPage} /> */}
+                <div className="sections-container">
+                    <button
+                        className="section-button"
+                        onClick={() => navigate('/statistiques')}
+                    >
+                        <div className="section-image statistiques"></div>
+                        <span>STATISTIQUES</span>
+                    </button>
+                    <button
+                        className="section-button"
+                        onClick={() => navigate('/stock')}
+                    >
+                        <div className="section-image stockage"></div>
+                        <span>STOCKAGE</span>
+                    </button>
+                    <button
+                        className="section-button"
+                        onClick={() => navigate('/tresorerie')}
+                    >
+                        <div className="section-image tresorerie"></div>
+                        <span>TRÉSORERIE</span>
+                    </button>
                 </div>
             </main>
-            <footer > All Rights Reserved - BDE ENSC © </footer>
+            <footer>All Rights Reserved - BDE ENSC ©</footer>
         </div>
     );
 }

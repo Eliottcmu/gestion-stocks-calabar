@@ -1,0 +1,169 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.back-button,
+.notification-button {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.sections-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.section-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 10rem;
+    height: 8rem;
+    border: none;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+}
+
+.section-image {
+    flex-grow: 1;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.statistiques {
+    background-image: url('../../public/statistiques.jpg');
+}
+
+.stockage {
+    background-image: url('../../public/stockage.webp');
+}
+
+.tresorerie {
+    background-image: url('../../public/tresorerie.jpg');
+}
+
+.add-event-button {
+    position: fixed;
+    bottom: 5rem;
+    right: 1rem;
+    border: none;
+    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s ease-in-out;
+}
+
+footer {
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Style global pour la mise en page mobile */
+@media (max-width: 768px) {
+    .home-container {
+        padding: 1rem;
+    }
+
+    .header {
+        padding: 0.5rem;
+    }
+
+    .sections-container {
+        gap: 2rem;
+        /* Espacement plus large entre les boutons */
+    }
+
+    .section-button {
+        width: 12rem;
+        /* Agrandir la largeur des boutons */
+        height: 12rem;
+        /* Augmenter la hauteur des boutons */
+        font-size: 1.2rem;
+        /* Augmenter la taille du texte */
+        padding: 1rem;
+        /* Ajouter un peu d'espace autour du contenu du bouton */
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+        /* Ombre plus douce pour un effet plus marqué */
+    }
+
+    .section-image {
+        height: 60%;
+        /* Ajuster la taille de l'image dans le bouton */
+    }
+
+    .section-button:hover {
+        transform: scale(1.05);
+        /* Légère animation au survol pour indiquer l'interaction */
+    }
+
+    .back-button,
+    .notification-button {
+        font-size: 1.8rem;
+        /* Agrandir les icônes pour les rendre plus accessibles */
+    }
+}
+
+/* État normal des boutons */
+.section-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 10rem;
+    height: 10rem;
+    border: none;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.section-button span {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.section-image {
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    height: 60%;
+    /* Ajuster la hauteur pour garder un aspect visuel agréable */
+}
