@@ -16,11 +16,9 @@ public class StocksController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Beers>>> GetBeers()
     {
-        Console.WriteLine("test");
         try
         {
             var beers = _mongoDBService.GetCollection<Beers>("Beers").Find(_ => true).ToList();
-            Console.WriteLine(beers);
             return Ok(beers);
         }
         catch (Exception ex)

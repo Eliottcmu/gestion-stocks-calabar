@@ -1,6 +1,8 @@
 import React from 'react';
 import './Home.css';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { FaUser } from 'react-icons/fa';
 
 function Home({ setPage }) {
     const navigate = useNavigate();
@@ -8,8 +10,11 @@ function Home({ setPage }) {
         <div className="home-container">
             <header className="header">
                 <h1>Accueil</h1>
-                {/* <button className="back-button">🔙</button>
-                <button className="notification-button">🔔</button> */}
+                <Link to="/profile" className="profile-link">
+                    <FaUser />
+                </Link>
+                {/* <button className="back-button">🔙</button> */}
+                {/*<button className="notification-button">🔔</button> */}
             </header>
             <main>
                 <div className="sections-container">

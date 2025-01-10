@@ -17,12 +17,16 @@ body {
     color: #000000;
 }
 
-.back-button,
-.notification-button {
+.profile-link {
     font-size: 1.5rem;
     background: none;
     border: none;
     cursor: pointer;
+    color: #000000;
+    margin-top: 0.3rem;
+    margin-left: 25rem;
+    position: fixed;
+    z-index: 100;
 }
 
 .sections-container {
@@ -91,7 +95,6 @@ footer {
     text-align: center;
 }
 
-/* Style global pour la mise en page mobile */
 @media (max-width: 768px) {
 
     .header {
@@ -113,9 +116,7 @@ footer {
         font-size: 2rem;
         margin: 0;
         text-transform: uppercase;
-        /* Texte en majuscules */
         letter-spacing: 1px;
-        /* Espacement entre les lettres */
         text-align: center;
     }
 
@@ -137,8 +138,7 @@ footer {
         height: 50%;
     }
 
-    .back-button,
-    .notification-button {
+    .profile-link {
         font-size: 1.8rem;
     }
 }
