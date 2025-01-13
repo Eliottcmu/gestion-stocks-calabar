@@ -32,15 +32,15 @@ export const postBeer = async (beer) => {
     }
 }
 
-export const putUser = async (user) => {
-    try {
-        const response = await axios.put(`${BASE_URL}/users/${user.id}`, user);
-        return response.data;
-    } catch (error) {
-        console.error('Erreur lors de la modification de l\'utilisateur :', error);
-        throw error;
-    }
-}
+// export const putUser = async (user) => {
+//     try {
+//         const response = await axios.put(`${BASE_URL}/users/${user.id}`, user);
+//         return response.data;
+//     } catch (error) {
+//         console.error('Erreur lors de la modification de l\'utilisateur :', error);
+//         throw error;
+//     }
+// }
 
 export const postUser = async (user) => {
     try {

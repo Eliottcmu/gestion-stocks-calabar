@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUsers, putUser, postUser } from '../services/api';
+import { getUsers, postUser } from '../services/api';
 import './Profile.css';
 
 const Profile = () => {
@@ -16,11 +16,11 @@ const Profile = () => {
             .catch((error) => console.error('Erreur lors du chargement des utilisateurs :', error));
     }, []);
 
-    useEffect(() => {
-        putUser()
-            .then((data) => setUsers(data))
-            .catch((error) => console.error('Erreur lors de la modification de l\'utilisateur :', error));
-    }, []);
+    // useEffect(() => {
+    //     putUser()
+    //         .then((data) => setUsers(data))
+    //         .catch((error) => console.error('Erreur lors de la modification de l\'utilisateur :', error));
+    // }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

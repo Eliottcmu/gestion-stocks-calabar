@@ -8,6 +8,7 @@ import Ventes from './pages/Ventes';
 import Tresorerie from './pages/Tresorerie';
 import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile';
+import './App.css';
 
 
 const App = () => {
