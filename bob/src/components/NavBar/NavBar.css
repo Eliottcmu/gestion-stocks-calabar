@@ -33,11 +33,6 @@
     margin-bottom: 5px;
 }
 
-/* Hover and active effects */
-.navlink:hover {
-    color: #493a04;
-}
-
 .navlink:active {
     color: rgba(0, 0, 0, 0.7);
 }

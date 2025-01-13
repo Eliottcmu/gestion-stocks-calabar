@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, postUser } from '../services/api';
 import './Profile.css';
+import './Pages.css';
 
 const Profile = () => {
     const [users, setUsers] = useState([]);

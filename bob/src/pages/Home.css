@@ -91,7 +91,7 @@
      justify-content: center;
      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
      cursor: pointer;
-     /* z-index: 1000; */
+     z-index: 1000;
      transition: transform 0.2s ease-in-out;
  }
 
@@ -115,9 +115,14 @@
          background-color: #ebdec6;
          color: #000000;
          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
+         padding-bottom: 1.5rem;
+         padding-top: 1.5rem;
      }
 
+     #bob {
+         height: 20rem;
+
+     }
 
      .header h1 {
          margin: 0;
@@ -140,11 +145,12 @@
      }
 
      .section-image {
-         height: 50%;
+         height: 80%;
      }
 
      .profile-link {
-         margin-left: 20rem;
+         margin-left: 22rem;
+         font-size: 1.4rem;
      }
 
      .section-button {

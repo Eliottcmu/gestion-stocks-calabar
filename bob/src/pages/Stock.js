@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getBeers, postBeer } from '../services/api';
+import './Pages.css';
 
 function Stock({ setPage }) {
     React.useEffect(() => {

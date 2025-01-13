@@ -1,4 +1,5 @@
 import React from 'react';
+import './Pages.css';
 
 function Statistiques({ setPage }) {
     // Appel de setPage pour mettre à jour l'état si nécessaire
