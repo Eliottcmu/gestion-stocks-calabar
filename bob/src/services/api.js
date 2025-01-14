@@ -32,15 +32,6 @@ export const postBeer = async (beer) => {
     }
 }
 
-// export const putUser = async (user) => {
-//     try {
-//         const response = await axios.put(`${BASE_URL}/users/${user.id}`, user);
-//         return response.data;
-//     } catch (error) {
-//         console.error('Erreur lors de la modification de l\'utilisateur :', error);
-//         throw error;
-//     }
-// }
 
 export const postUser = async (user) => {
     try {
@@ -48,6 +39,46 @@ export const postUser = async (user) => {
         return response.data;
     } catch (error) {
         console.error('Erreur lors de la création de l\'utilisateur :', error);
+        throw error;
+    }
+}
+
+export const putUser = async (userId, updatedUser) => {
+    try {
+        const response = await axios.put(`${BASE_URL}/users/${userId}`, updatedUser);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la modification de l\'utilisateur :', error);
+        throw error;
+    }
+}
+
+export const deleteUser = async (userId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/users/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la suppression de l\'utilisateur :', error);
+        throw error;
+    }
+}
+
+export const putBeer = async (beerId, updatedBeer) => {
+    try {
+        const response = await axios.put(`${BASE_URL}/stock/${beerId}`, updatedBeer);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la modification de la bière :', error);
+        throw error;
+    }
+}
+
+export const deleteBeer = async (beerId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/stock/${beerId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la bière :', error);
         throw error;
     }
 }

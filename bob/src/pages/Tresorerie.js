@@ -1,5 +1,4 @@
 import React from 'react';
-import './Pages.css';
 
 function Tresorerie({ setPage }) {
     React.useEffect(() => {

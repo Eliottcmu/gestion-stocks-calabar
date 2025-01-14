@@ -43,16 +43,22 @@ public class StocksController : ControllerBase
     }
 
     // PUT:
-    [HttpPut]
-    public async Task<ActionResult<Beers>> PutBeer(Beers beer)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<Beers>> PutBeer(string id, Beers beer)
     {
-        if (beer == null || string.IsNullOrEmpty(beer.id))
+        if (beer == null || string.IsNullOrEmpty(id))
         {
             return BadRequest("Invalid beer data.");
         }
 
+        beer.id = id; // S'assurer que l'ID correspond au paramètre de route
         var collection = _mongoDBService.GetCollection<Beers>("Beers");
-        collection.ReplaceOne(b => b.id == beer.id, beer);
+        var result = await collection.ReplaceOneAsync(b => b.id == id, beer);
+
+        if (result.MatchedCount == 0)
+        {
+            return NotFound("Beer not found");
+        }
 
         return Ok(beer);
     }

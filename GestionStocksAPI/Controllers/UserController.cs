@@ -51,16 +51,17 @@ public class UserController : ControllerBase
     }
 
     // PUT: Update an existing user
-    [HttpPut]
-    public async Task<ActionResult<User>> PutUser(User user)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<User>> PutUser(string id, User user)
     {
-        if (user == null || string.IsNullOrEmpty(user.id))
+        if (user == null || string.IsNullOrEmpty(id))
         {
             return BadRequest("Invalid user data.");
         }
 
+        user.id = id; // Ensure the ID matches the route parameter
         var collection = _mongoDBService.GetCollection<User>("Users");
-        var result = await collection.ReplaceOneAsync(u => u.id == user.id, user);
+        var result = await collection.ReplaceOneAsync(u => u.id == id, user);
 
         if (result.MatchedCount == 0)
         {

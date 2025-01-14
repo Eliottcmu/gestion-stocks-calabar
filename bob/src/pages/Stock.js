@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { getBeers, postBeer } from '../services/api';
-import './Pages.css';
+import { getBeers, postBeer, putBeer, deleteBeer } from '../services/api';
 
 function Stock({ setPage }) {
-    React.useEffect(() => {
+    useEffect(() => {
         setPage('Stock');
     }, [setPage]);
 
     const [beers, setBeers] = useState([]);
-    const [newBeer, setNewBeer] = useState({
-        name: '',
-        quantity: '',
-        price: '',
-    });
+    const [newBeer, setNewBeer] = useState({ name: '', price: '', quantity: '' });
+    const [editingBeer, setEditingBeer] = useState(null);
+    const [editBeerForm, setEditBeerForm] = useState({ name: '', price: '', quantity: '' });
 
+    // Chargement initial des bières
     useEffect(() => {
         getBeers()
             .then((data) => {
@@ -23,82 +21,165 @@ function Stock({ setPage }) {
             .catch((error) => console.error('Erreur lors du chargement des bières :', error));
     }, []);
 
-    const handleInputChange = (e) => {
+    const handleBeerInputChange = (e) => {
         const { name, value } = e.target;
-        setNewBeer((prevBeer) => ({
-            ...prevBeer,
-            [name]: value,
-        }));
+        setNewBeer((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleEditBeerInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditBeerForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleBeerSubmit = async (e) => {
         e.preventDefault();
         try {
             const addedBeer = await postBeer(newBeer);
-            setBeers((prevBeers) => [...prevBeers, addedBeer]);
-            setNewBeer({ name: '', quantity: '', price: '' });
+            setBeers((prev) => [...prev, addedBeer]);
+            setNewBeer({ name: '', price: '', quantity: '' });
         } catch (error) {
             console.error('Erreur lors de l\'ajout de la bière :', error);
+        }
+    };
+
+    const startEditingBeer = (beer) => {
+        setEditingBeer(beer.id);
+        setEditBeerForm({
+            name: beer.name || '',
+            price: beer.price || '',
+            quantity: beer.quantity || ''
+        });
+    };
+
+    const handleUpdateBeerSubmit = async (beerId) => {
+        try {
+            const beerData = {
+                ...editBeerForm,
+                id: beerId
+            };
+            const updatedBeer = await putBeer(beerId, beerData);
+            setBeers((prev) =>
+                prev.map((beer) => (beer.id === beerId ? updatedBeer : beer))
+            );
+            setEditingBeer(null);
+        } catch (error) {
+            console.error('Erreur lors de la modification de la bière :', error);
+        }
+    };
+    const handleDeleteBeer = async (beerId) => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer cette bière ?')) {
+            try {
+                await deleteBeer(beerId);
+                setBeers((prev) => prev.filter((beer) => beer.id !== beerId));
+            } catch (error) {
+                console.error('Erreur lors de la suppression de la bière :', error);
+            }
         }
     };
 
     return (
         <div>
             <header>
-                <h1>Stock</h1>
+                <h1 className="stock">Stock</h1>
             </header>
             <main>
-                <div className="stock-main">
-                    <p>Bienvenue sur la page Stock.</p>
-                </div>
-                <h1>Liste des bières</h1>
+                <h2>Liste des bières</h2>
                 <div className="beers-list">
-                    {Array.isArray(beers) && beers.length > 0 ? (
+                    {beers.length > 0 ? (
                         beers.map((beer) => (
                             <div className="beer-card" key={beer.id}>
-                                <h2>Name : {beer.name}</h2>
-                                <p>Quantité : {beer.quantity}</p>
-                                <p>Prix : {beer.price}</p>
+                                {editingBeer === beer.id ? (
+                                    <form
+                                        onSubmit={(e) => {
+                                            e.preventDefault();
+                                            handleUpdateBeerSubmit(beer.id);
+                                        }}
+                                    >
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={editBeerForm.name || ''}
+                                            onChange={handleEditBeerInputChange}
+                                            required
+                                        />
+                                        <input
+                                            type="number"
+                                            name="price"
+                                            value={editBeerForm.price || ''}
+                                            onChange={handleEditBeerInputChange}
+                                            required
+                                        />
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            value={editBeerForm.quantity || ''}
+                                            onChange={handleEditBeerInputChange}
+                                            required
+                                        />
+                                        <div className="button-group">
+                                            <button type="submit">Sauvegarder</button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditingBeer(null)}
+                                            >
+                                                Annuler
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <>
+                                        <h3>Nom : {beer.name}</h3>
+                                        <p>Prix : {beer.price}</p>
+                                        <p>Quantité : {beer.quantity}</p>
+                                        <div className="button-group">
+                                            <button onClick={() => startEditingBeer(beer)}>
+                                                Modifier
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteBeer(beer.id)}
+                                                className="delete-button"
+                                            >
+                                                Supprimer
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ))
                     ) : (
                         <p>Chargement ou aucune bière disponible.</p>
                     )}
                 </div>
-                <div>
-                    <h2>Ajouter une bière</h2>
-                    <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Nom"
-                            value={newBeer.name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="quantity"
-                            placeholder="Quantité"
-                            value={newBeer.quantity}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="text"
-                            name="price"
-                            placeholder="Prix"
-                            value={newBeer.price}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <button type="submit">Ajouter</button>
-                    </form>
-                </div>
+                <h2>Ajouter une bière</h2>
+                <form onSubmit={handleBeerSubmit}>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Nom de la bière"
+                        value={newBeer.name}
+                        onChange={handleBeerInputChange}
+                        required
+                    />
+                    <input
+                        type="number"
+                        name="price"
+                        placeholder="Prix de bière"
+                        value={newBeer.price}
+                        onChange={handleBeerInputChange}
+                        required
+                    />
+                    <input
+                        type="number"
+                        name="quantity"
+                        placeholder="Quantité"
+                        value={newBeer.quantity}
+                        onChange={handleBeerInputChange}
+                        required
+                    />
+                    <button type="submit">Ajouter</button>
+                </form>
             </main>
-            <footer>
-                All Rights Reserved - BDE ENSC ©
-            </footer>
+            <footer>All Rights Reserved - BDE ENSC ©</footer>
         </div>
     );
 }

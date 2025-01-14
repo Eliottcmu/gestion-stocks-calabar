@@ -3,7 +3,6 @@ import './Home.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
-import './Pages.css';
 
 function Home({ setPage }) {
     const navigate = useNavigate();
