@@ -82,3 +82,25 @@ export const deleteBeer = async (beerId) => {
         throw error;
     }
 }
+
+// Récupérer toutes les ventes
+export const getVentes = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/ventes`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des ventes :', error);
+        throw error;
+    }
+};
+
+// Créer une nouvelle vente
+export const postVentes = async (vente) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/ventes`, vente);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la création de la vente :', error);
+        throw error;
+    }
+};
