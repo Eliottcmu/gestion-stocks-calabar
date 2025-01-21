@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, postUser, putUser, deleteUser } from '../services/api';
+import Loader from '../components/Loader/Loader';
 import './Profile.css';
 
 const Profile = () => {
     const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
     const [editingUser, setEditingUser] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', email: '', password: '' });
 
     useEffect(() => {
-        getUsers()
-            .then((userData) => {
-                setUsers(userData);
-            })
-            .catch(error => console.error('Erreur lors du chargement :', error));
+        loadUsers();
     }, []);
+
+    const loadUsers = async () => {
+        try {
+            const userData = await getUsers();
+            setUsers(userData);
+            setLoading(false);
+        } catch (error) {
+            console.error('Erreur lors du chargement :', error);
+            setLoading(false);
+        }
+    };
 
     const handleDeleteUser = async (userId) => {
         if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
@@ -76,7 +85,9 @@ const Profile = () => {
             console.error('Erreur lors de la modification de l\'utilisateur :', error);
         }
     };
-
+    if (loading) {
+        return <Loader message="Chargement des utilisateurs..." />;
+    }
     if (!users.length) return <div className="loading">Chargement...</div>;
 
     return (

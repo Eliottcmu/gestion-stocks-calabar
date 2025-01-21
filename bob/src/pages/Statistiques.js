@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Loader from '../components/Loader/Loader';
 
 function Statistiques({ setPage }) {
-    // Appel de setPage pour mettre à jour l'état si nécessaire
-    React.useEffect(() => {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
         setPage('Statistiques');
+        // Simuler un chargement initial
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+        return () => clearTimeout(timer);
     }, [setPage]);
+
+    if (loading) {
+        return <Loader message="Chargement des statistiques..." />;
+    }
 
     return (
         <div>

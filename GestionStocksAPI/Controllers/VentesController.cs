@@ -32,7 +32,6 @@ public class VentesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Ventes>> PostVentes([FromBody] Ventes vente)
     {
-        Console.WriteLine($"Requête reçue : {vente}");
         if (vente == null)
         {
             Console.WriteLine($"vente == null true !!");

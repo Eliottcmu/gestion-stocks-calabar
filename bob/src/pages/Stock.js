@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { getBeers, postBeer, putBeer, deleteBeer } from '../services/api';
+import Loader from '../components/Loader/Loader';
 
 function Stock({ setPage }) {
-    useEffect(() => {
-        setPage('Stock');
-    }, [setPage]);
-
     const [beers, setBeers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [newBeer, setNewBeer] = useState({ name: '', price: '', quantity: '' });
     const [editingBeer, setEditingBeer] = useState(null);
     const [editBeerForm, setEditBeerForm] = useState({ name: '', price: '', quantity: '' });
 
-    // Chargement initial des bières
+
     useEffect(() => {
-        getBeers()
-            .then((data) => {
-                if (Array.isArray(data)) setBeers(data);
-                else console.error("Les données reçues ne sont pas un tableau :", data);
-            })
-            .catch((error) => console.error('Erreur lors du chargement des bières :', error));
-    }, []);
+        setPage('Stock');
+        loadBeers();
+    }, [setPage]);
+
+    const loadBeers = async () => {
+        try {
+            const data = await getBeers();
+            if (Array.isArray(data)) setBeers(data);
+            else console.error("Les données reçues ne sont pas un tableau :", data);
+            setLoading(false);
+        } catch (error) {
+            console.error('Erreur lors du chargement des bières :', error);
+            setLoading(false);
+        }
+    };
 
     const handleBeerInputChange = (e) => {
         const { name, value } = e.target;
@@ -50,6 +56,10 @@ function Stock({ setPage }) {
             quantity: beer.quantity || ''
         });
     };
+
+    if (loading) {
+        return <Loader message="Chargement du stock..." />;
+    }
 
     const handleUpdateBeerSubmit = async (beerId) => {
         try {

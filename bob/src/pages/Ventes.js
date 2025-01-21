@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getBeers, putBeer, postVentes } from '../services/api';
+import Loader from '../components/Loader/Loader';
+import './Ventes.css';
 
-const Ventes = ({ setPage, currentUser }) => {
+const Ventes = ({ setPage }) => {
     const [beers, setBeers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -34,25 +36,17 @@ const Ventes = ({ setPage, currentUser }) => {
                 quantity: beer.quantity - 1
             };
 
-            // Mettre à jour le stock
             await putBeer(beer.id, updatedBeer);
 
-            // Créer la vente
             const vente = {
                 date: new Date(),
                 idProduit: beer.id,
-                // idUser: currentUser ? currentUser.id : null, -> plus tard Récupérer l'id de l'utilisateur connecté
                 quantite: 1,
                 montant: beer.price,
                 name: beer.name,
-                // Ajouter le nom de l'utilisateur, si disponible
-                // userName: currentUser ? currentUser.name : null
             };
 
-            // Enregistrer la vente
             await postVentes(vente);
-
-            // Recharger les bières pour mettre à jour l'affichage
             loadBeers();
         } catch (err) {
             setError('Erreur lors de la vente');
@@ -60,54 +54,65 @@ const Ventes = ({ setPage, currentUser }) => {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+        return <Loader message="Chargement des bières..." />;
     }
 
     if (error) {
-        return <div className="text-red-500 text-center p-4">{error}</div>;
+        return (
+            <div className="error-message" role="alert">
+                {error}
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4">
-                    <h1 className="text-3xl font-bold text-gray-900">Ventes</h1>
+        <div className="ventes-container">
+            <header className="header" role="banner">
+                <div className="header-content">
+                    <h1 tabIndex="0">Ventes</h1>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto py-6 px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <main className="main-content" role="main">
+                <div className="beer-grid">
                     {beers.map((beer) => (
                         <div
                             key={beer.id}
-                            className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+                            className="beer-card"
+                            tabIndex="0"
+                            role="article"
+                            aria-label={`${beer.name} - Prix: ${beer.price}€ - Stock: ${beer.quantity}`}
                         >
-                            <h2 className="text-xl font-semibold text-gray-900">{beer.name}</h2>
-                            <div className="mt-4">
-                                <p className="text-gray-600">Prix: {beer.price} €</p>
-                                <p className="text-gray-600">
-                                    Stock: <span className={beer.quantity <= 5 ? 'text-red-500' : ''}>
+                            <h2>{beer.name}</h2>
+                            <div className="beer-info">
+                                <p>Prix: {beer.price.toFixed(2)} €</p>
+                                <p>
+                                    Stock: <span className={beer.quantity <= 5 ? 'low-stock' : ''}>
                                         {beer.quantity}
                                     </span>
+                                    {beer.quantity <= 5 && (
+                                        <span className="sr-only"> - Stock faible</span>
+                                    )}
                                 </p>
                             </div>
                             <button
                                 onClick={() => handleSell(beer)}
                                 disabled={beer.quantity <= 0}
-                                className={`mt-4 w-full px-4 py-2 rounded-md text-white font-medium
-                  ${beer.quantity <= 0
-                                        ? 'bg-gray-400 cursor-not-allowed'
-                                        : 'bg-blue-600 hover:bg-blue-700'}`}
+                                className={`sell-button ${beer.quantity <= 0 ? 'disabled' : ''}`}
+                                aria-disabled={beer.quantity <= 0}
                             >
-                                Vendre
+                                {beer.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
                             </button>
                         </div>
                     ))}
                 </div>
             </main>
 
-            <footer className="bg-white mt-8 py-4 text-center">
-                All Rights Reserved - BDE ENSC ©
+            <footer className="footer" role="contentinfo">
+                <p>
+                    All Rights Reserved - BDE ENSC ©
+                    <span className="sr-only">Bureau des étudiants ENSC</span>
+                </p>
             </footer>
         </div>
     );
