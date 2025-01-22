@@ -6,203 +6,146 @@
     --border-color: #e5e7eb;
     --text-color: #374151;
     --header-height: 4rem;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --gray-100: #f3f4f6;
+    --gray-300: #d1d5db;
 }
 
-/* Styles de base et utilitaires */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-
-/* Container principal */
+/* Container styles */
 .tresorerie-container {
-    min-height: 100vh;
     background-color: var(--background-color);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
-
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    gap: 1.5rem;
-}
-
-.loader-logo {
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
-}
-
-.loading-text {
-    font-size: 1.1rem;
-    color: var(--primary-color);
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Message d'erreur */
-.error-message {
-    color: var(--error-color);
-    text-align: center;
     padding: 1rem;
-    margin: 1rem;
-    background-color: var(--white);
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Header */
+/* Header styles */
 .header {
-    background-color: var(--white);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.header-content {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 1rem;
-}
-
-.header h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-@media (min-width: 768px) {
-    .header h1 {
-        font-size: 1.875rem;
-    }
-}
-
-/* Contenu principal */
-.main-content {
-    flex: 1;
-    margin: 0 auto;
-    padding: 1rem;
     width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 1rem;
+    text-align: center;
 }
 
-/* Carte total */
-.total-card {
+.header-content h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Filters section */
+.filters-container {
     background-color: var(--white);
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     margin-bottom: 1rem;
+    width: 100%;
+    max-width: 1200px;
 }
 
-.total-card h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--primary-color);
+.filters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
-/* Container de table avec scroll horizontal sur mobile */
+@media (min-width: 768px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.controls-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+/* Sales details cards */
 .table-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 1rem;
+}
+
+.card {
     background-color: var(--white);
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.table-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 0 0 1rem;
-}
-
-/* Styles de table responsive */
-table {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     width: 100%;
-    border-collapse: collapse;
 }
 
-th,
-td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
-th {
-    background-color: var(--background-color);
-    font-weight: 600;
+.card-body {
+    font-size: 0.9rem;
     color: var(--text-color);
+    line-height: 1.5;
 }
 
-/* Styles pour mobile */
-@media (max-width: 767px) {
-    table {
-        display: block;
-    }
-
-    table thead {
-        display: none;
-    }
-
-    table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border-bottom: 2px solid var(--border-color);
-    }
-
-    table tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 1rem;
-        border: none;
-    }
-
-    table tbody td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        margin-right: 1rem;
-    }
+.card-body span {
+    display: block;
+    margin-top: 0.25rem;
+    font-weight: 500;
 }
 
-/* Footer */
+/* Scrollable cards */
+.table-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.table-scroll::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--blue-500);
+    border-radius: 0.25rem;
+}
+
+/* Footer styles */
 .footer {
-    background-color: var(--white);
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
     padding: 1rem;
     text-align: center;
     margin-top: auto;
 }
 
-/* Styles d'impression */
-@media print {
-    .tresorerie-container {
-        background: var(--white);
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
     }
 
-    .header {
-        box-shadow: none;
-    }
-
-    .total-card,
-    .table-container {
-        box-shadow: none;
-        border: 1px solid var(--border-color);
+    .controls-row {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
