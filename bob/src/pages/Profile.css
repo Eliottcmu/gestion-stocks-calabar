@@ -86,3 +86,27 @@ button {
 button:hover {
     opacity: 0.9;
 }
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+}
+
+.password-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

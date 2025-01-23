@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, postUser, putUser, deleteUser } from '../services/api';
 import Loader from '../components/Loader/Loader';
+import { Eye, EyeOff } from 'lucide-react';
 import './Profile.css';
 
 const Profile = () => {
@@ -9,6 +10,7 @@ const Profile = () => {
     const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
     const [editingUser, setEditingUser] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', email: '', password: '' });
+    const [visiblePasswords, setVisiblePasswords] = useState({});
 
     useEffect(() => {
         loadUsers();
@@ -85,6 +87,14 @@ const Profile = () => {
             console.error('Erreur lors de la modification de l\'utilisateur :', error);
         }
     };
+
+    const togglePasswordVisibility = (userId) => {
+        setVisiblePasswords(prev => ({
+            ...prev,
+            [userId]: !prev[userId]
+        }));
+    };
+
     if (loading) {
         return <Loader message="Chargement des utilisateurs..." />;
     }
@@ -116,13 +126,22 @@ const Profile = () => {
                                         onChange={handleEditInputChange}
                                         required
                                     />
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        value={editForm.password}
-                                        onChange={handleEditInputChange}
-                                        required
-                                    />
+                                    <div className="password-input-container">
+                                        <input
+                                            type={visiblePasswords[user.id] ? "text" : "password"}
+                                            name="password"
+                                            value={editForm.password}
+                                            onChange={handleEditInputChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => togglePasswordVisibility(user.id)}
+                                            className="password-toggle-btn"
+                                        >
+                                            {visiblePasswords[user.id] ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </button>
+                                    </div>
                                     <div className="button-group">
                                         <button type="submit">Sauvegarder</button>
                                         <button type="button" onClick={() => setEditingUser(null)}>Annuler</button>
@@ -132,7 +151,17 @@ const Profile = () => {
                                 <>
                                     <h2>Name : {user.name}</h2>
                                     <p>Email : {user.email}</p>
-                                    <p>Password : {user.password}</p>
+                                    <div className="password-display">
+                                        <p>
+                                            Password : {visiblePasswords[user.id] ? user.password : '•'.repeat(user.password.length)}
+                                            <button
+                                                onClick={() => togglePasswordVisibility(user.id)}
+                                                className="password-toggle-btn"
+                                            >
+                                                {visiblePasswords[user.id] ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </button>
+                                        </p>
+                                    </div>
                                     <div className="button-group">
                                         <button onClick={() => startEditing(user)}>Modifier</button>
                                         <button onClick={() => handleDeleteUser(user.id)} className="delete-button">
@@ -163,14 +192,16 @@ const Profile = () => {
                             onChange={handleInputChange}
                             required
                         />
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Mot de passe"
-                            value={newUser.password}
-                            onChange={handleInputChange}
-                            required
-                        />
+                        <div className="password-input-container">
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Mot de passe"
+                                value={newUser.password}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
                         <button type="submit">Ajouter</button>
                     </form>
                 </div>

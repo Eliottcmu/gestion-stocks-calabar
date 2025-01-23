@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getVentes } from '../services/api';
 import Loader from '../components/Loader/Loader';
 
 function formatDateTime(datetime) {
+    if (!datetime || datetime === 'Invalid Date') return '';
+    const date = new Date(datetime);
+    if (isNaN(date.getTime())) return '';
+
     const options = {
         day: '2-digit',
         month: 'long',
@@ -12,9 +16,8 @@ function formatDateTime(datetime) {
         hour12: false
     };
 
-    return new Intl.DateTimeFormat('fr-FR', options).format(new Date(datetime));
+    return new Intl.DateTimeFormat('fr-FR', options).format(date);
 }
-
 
 const CustomSelect = ({ value, onChange, options }) => (
     <select
@@ -69,6 +72,11 @@ const Tresorerie = ({ setPage }) => {
     const [produitFilter, setProduitFilter] = useState('');
     const [groupBy, setGroupBy] = useState('none');
 
+    const productList = useMemo(() => {
+        return [...new Set(ventes.map(vente => vente.name))].sort();
+    }, [ventes]);
+
+
     useEffect(() => {
         setPage('Tresorerie');
         loadVentes();
@@ -77,9 +85,11 @@ const Tresorerie = ({ setPage }) => {
     const loadVentes = async () => {
         try {
             const data = await getVentes();
-            setVentes(data);
-            setFilteredVentes(data);
-            updateTotal(data);
+
+            const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+            setVentes(sortedData);
+            setFilteredVentes(sortedData);
+            updateTotal(sortedData);
             setLoading(false);
         } catch (err) {
             setError('Erreur lors du chargement des ventes');
@@ -96,15 +106,13 @@ const Tresorerie = ({ setPage }) => {
         let filtered = [...ventes];
 
         if (dateStart) {
-            filtered = filtered.filter(vente => vente.date >= dateStart);
+            filtered = filtered.filter(vente => new Date(vente.date) >= new Date(dateStart));
         }
         if (dateEnd) {
-            filtered = filtered.filter(vente => vente.date <= dateEnd);
+            filtered = filtered.filter(vente => new Date(vente.date) <= new Date(dateEnd));
         }
         if (produitFilter) {
-            filtered = filtered.filter(vente =>
-                vente.name.toLowerCase().includes(produitFilter.toLowerCase())
-            );
+            filtered = filtered.filter(vente => vente.name === produitFilter);
         }
 
         setFilteredVentes(filtered);
@@ -154,7 +162,8 @@ const Tresorerie = ({ setPage }) => {
             grouped[key].entries.push(vente);
         });
 
-        return Object.values(grouped);
+
+        return Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date));
     };
 
     if (loading) return <Loader message="Chargement de la trésorerie..." />;
@@ -171,72 +180,99 @@ const Tresorerie = ({ setPage }) => {
     return (
         <div className="tresorerie-container">
             <header className="header" role="banner">
-                <div className="header-content">
-                    <h1 tabIndex="0">Trésorerie</h1>
-                </div>
+                <h1>Trésorerie</h1>
             </header>
 
-            <main className="main-content" role="main">
+            <main className="main-content">
                 <div className="filters-container">
                     <div className="filters-grid">
-                        <CustomDatePicker
-                            value={dateStart}
-                            onChange={setDateStart}
-                            placeholder="Date début"
-                        />
-                        <CustomDatePicker
-                            value={dateEnd}
-                            onChange={setDateEnd}
-                            placeholder="Date fin"
-                        />
-                        <CustomInput
-                            type="text"
-                            placeholder="Filtrer par produit"
-                            value={produitFilter}
-                            onChange={setProduitFilter}
-                        />
+                        <div className="filter-item">
+                            <label>Date début</label>
+                            <input
+                                type="date"
+                                value={dateStart}
+                                onChange={(e) => setDateStart(e.target.value)}
+                                className="filter-input"
+                            />
+                        </div>
+
+                        <div className="filter-item">
+                            <label>Date fin</label>
+                            <input
+                                type="date"
+                                value={dateEnd}
+                                onChange={(e) => setDateEnd(e.target.value)}
+                                className="filter-input"
+                            />
+                        </div>
+
+                        <div className="filter-item">
+                            <label>Produit</label>
+                            <select
+                                value={produitFilter}
+                                onChange={(e) => setProduitFilter(e.target.value)}
+                                className="filter-input"
+                            >
+                                <option value="">Tous les produits</option>
+                                {productList.map(product => (
+                                    <option key={product} value={product}>
+                                        {product}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="filter-item">
+                            <label>Groupement</label>
+                            <select
+                                value={groupBy}
+                                onChange={(e) => setGroupBy(e.target.value)}
+                                className="filter-input"
+                            >
+                                {groupOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    <div className="controls-row">
-                        <CustomSelect
-                            value={groupBy}
-                            onChange={setGroupBy}
-                            options={groupOptions}
-                        />
-                        <CustomButton onClick={applyFilters}>
-                            Appliquer les filtres
-                        </CustomButton>
-                        <CustomButton variant="secondary" onClick={resetFilters}>
+                    <div className="filter-actions">
+                        <button onClick={applyFilters} className="btn btn-primary">
+                            Appliquer
+                        </button>
+                        <button onClick={resetFilters} className="btn btn-secondary">
                             Réinitialiser
-                        </CustomButton>
+                        </button>
                     </div>
                 </div>
 
-                <div className="total-card" tabIndex="0" aria-label="Résumé des ventes">
-                    <h2>Total des ventes: <span aria-label="Montant">{total.toFixed(2)} €</span></h2>
+                <div className="total-card">
+                    <h2>Total des ventes: <span>{total.toFixed(2)} €</span></h2>
                 </div>
 
                 <div className="table-container">
-                    <div className="table-scroll" role="region" aria-label="Liste des ventes" tabIndex="0">
-                        {groupedVentes.map((vente, index) => (
-                            <div key={index} className="card">
-                                <div className="card-header">
-                                    <span>{formatDateTime(vente.date)}</span>
-                                    <span>  {vente.montant.toFixed(2)} €</span>
-                                </div>
-                                <div className="card-body">
-                                    <span>Produit : {vente.name}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <table className="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Produit</th>
+                                <th>Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {groupedVentes.map((vente, index) => (
+                                <tr key={index}>
+                                    <td data-label="Date">{formatDateTime(vente.date)}</td>
+                                    <td data-label="Produit">{vente.name}</td>
+                                    <td data-label="Montant">{vente.montant.toFixed(2)} €</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-
             </main>
-
-            <footer className="footer" role="contentinfo">
-                <p>All Rights Reserved - BDE ENSC © <span className="sr-only">Bureau des étudiants ENSC</span></p>
-            </footer>
         </div>
     );
 };
