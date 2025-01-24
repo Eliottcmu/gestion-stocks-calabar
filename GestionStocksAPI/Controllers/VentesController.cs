@@ -48,4 +48,39 @@ public class VentesController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteVente(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return BadRequest("Invalid vente ID.");
+        }
+
+        var collection = _mongoDBService.GetCollection<Ventes>("Ventes");
+        var result = await collection.DeleteOneAsync(v => v.id == id);
+
+        if (result.DeletedCount == 0)
+        {
+            return NotFound("Vente pas trouvée");
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteAllVentes()
+    {
+        try
+        {
+            var collection = _mongoDBService.GetCollection<Ventes>("Ventes");
+            var result = await collection.DeleteManyAsync(_ => true);
+
+            return Ok($"Deleted {result.DeletedCount} ventes");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
 }

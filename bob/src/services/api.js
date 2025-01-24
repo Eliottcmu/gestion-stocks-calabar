@@ -104,3 +104,24 @@ export const postVentes = async (vente) => {
         throw error;
     }
 };
+//delete one vente avec l'id
+export const deleteVente = async (venteId) => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/ventes/${venteId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la vente :', error);
+        throw error;
+    }
+};
+
+// Delete all ventes
+export const deleteAllVentes = async () => {
+    try {
+        const response = await axios.delete(`${BASE_URL}/ventes`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la suppression de toutes les ventes :', error);
+        throw error;
+    }
+};

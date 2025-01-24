@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getVentes } from '../services/api';
+import { getVentes,deleteVente, deleteAllVentes } from '../services/api';
 import Loader from '../components/Loader/Loader';
 
 function formatDateTime(datetime) {
@@ -18,47 +18,6 @@ function formatDateTime(datetime) {
 
     return new Intl.DateTimeFormat('fr-FR', options).format(date);
 }
-
-const CustomSelect = ({ value, onChange, options }) => (
-    <select
-        className="custom-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-    >
-        {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-    </select>
-);
-
-const CustomInput = ({ type, value, onChange, placeholder }) => (
-    <input
-        type={type}
-        className="custom-input"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-    />
-);
-
-const CustomButton = ({ onClick, variant = 'primary', children }) => (
-    <button
-        onClick={onClick}
-        className={`custom-button ${variant === 'primary' ? 'custom-button-primary' : 'custom-button-secondary'}`}
-    >
-        {children}
-    </button>
-);
-
-const CustomDatePicker = ({ value, onChange, placeholder }) => (
-    <input
-        type="date"
-        className="custom-date-picker"
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-    />
-);
 
 const Tresorerie = ({ setPage }) => {
     const [ventes, setVentes] = useState([]);
@@ -100,6 +59,34 @@ const Tresorerie = ({ setPage }) => {
     const updateTotal = (data) => {
         const totalVentes = data.reduce((acc, vente) => acc + vente.montant, 0);
         setTotal(totalVentes);
+    };
+    const handleDeleteVente = async (venteId) => {
+        const confirmDelete = window.confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');
+        if (confirmDelete) {
+            try {
+                await deleteVente(venteId);
+                const updatedVentes = ventes.filter(vente => vente.id !== venteId);
+                setVentes(updatedVentes);
+                setFilteredVentes(updatedVentes);
+                updateTotal(updatedVentes);
+            } catch (err) {
+                setError('Erreur lors de la suppression de la vente');
+            }
+        }
+    };
+
+    const handleResetAllVentes = async () => {
+        const confirmReset = window.confirm('Êtes-vous sûr de vouloir supprimer toutes les ventes ?');
+        if (confirmReset) {
+            try {
+                await deleteAllVentes();
+                setVentes([]);
+                setFilteredVentes([]);
+                setTotal(0);
+            } catch (err) {
+                setError('Erreur lors de la suppression de toutes les ventes');
+            }
+        }
     };
 
     const applyFilters = () => {
@@ -247,7 +234,14 @@ const Tresorerie = ({ setPage }) => {
                         </button>
                     </div>
                 </div>
-
+                <div className="table-actions">
+                    <button 
+                        onClick={handleResetAllVentes} 
+                        className="btn btn-danger"
+                    >
+                        Réinitialiser toutes les ventes
+                    </button>
+                </div>
                 <div className="total-card">
                     <h2>Total des ventes: <span>{total.toFixed(2)} €</span></h2>
                 </div>
@@ -267,6 +261,16 @@ const Tresorerie = ({ setPage }) => {
                                     <td data-label="Date">{formatDateTime(vente.date)}</td>
                                     <td data-label="Produit">{vente.name}</td>
                                     <td data-label="Montant">{vente.montant.toFixed(2)} €</td>
+                                    <td data-label="Actions">
+                                        {!vente.entries && ( // Only show delete for individual entries, not grouped
+                                            <button 
+                                                onClick={() => handleDeleteVente(vente.id)} 
+                                                className="btn btn-sm btn-danger"
+                                            >
+                                                Supprimer
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
