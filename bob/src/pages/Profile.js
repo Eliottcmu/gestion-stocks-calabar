@@ -4,6 +4,14 @@ import Loader from '../components/Loader/Loader';
 import { Eye, EyeOff } from 'lucide-react';
 import './Profile.css';
 
+const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+const validatePassword = (password) => {
+    return password.length > 3;
+};
+
 const Profile = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -11,6 +19,8 @@ const Profile = () => {
     const [editingUser, setEditingUser] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', email: '', password: '' });
     const [visiblePasswords, setVisiblePasswords] = useState({});
+    const [errors, setErrors] = useState({ newUser: {}, editForm: {} });
+    const [touched, setTouched] = useState({ newUser: {}, editForm: {} });
 
     useEffect(() => {
         loadUsers();
@@ -31,68 +41,113 @@ const Profile = () => {
         if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
             try {
                 await deleteUser(userId);
-                setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+                setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
             } catch (error) {
-                console.error('Erreur lors de la suppression de l\'utilisateur :', error);
+                console.error("Erreur lors de la suppression de l'utilisateur :", error);
             }
         }
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewUser((prevUser) => ({
-            ...prevUser,
-            [name]: value,
-        }));
+        setNewUser((prevUser) => ({ ...prevUser, [name]: value }));
+        validateField('newUser', name, value);
     };
 
     const handleEditInputChange = (e) => {
         const { name, value } = e.target;
-        setEditForm((prev) => ({
+        setEditForm((prev) => ({ ...prev, [name]: value }));
+        validateField('editForm', name, value);
+    };
+
+    const validateField = (formType, fieldName, value) => {
+        const newErrors = { ...errors[formType] };
+
+        if (fieldName === 'email' && value) {
+            if (!validateEmail(value)) {
+                newErrors.email = "L'email doit être valide.";
+            } else {
+                delete newErrors.email;
+            }
+        }
+
+        if (fieldName === 'password' && value) {
+            if (!validatePassword(value)) {
+                newErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
+            } else {
+                delete newErrors.password;
+            }
+        }
+
+        setErrors(prev => ({ ...prev, [formType]: newErrors }));
+    };
+
+    const handleBlur = (formType, fieldName) => {
+        setTouched(prev => ({
             ...prev,
-            [name]: value,
+            [formType]: { ...prev[formType], [fieldName]: true }
         }));
+
+        const value = formType === 'newUser' ? newUser[fieldName] : editForm[fieldName];
+        validateField(formType, fieldName, value);
+    };
+
+    const validateNewUser = () => {
+        const newErrors = {};
+        if (!validateEmail(newUser.email)) newErrors.email = "L'email doit être valide.";
+        if (!validatePassword(newUser.password)) newErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
+        setErrors((prev) => ({ ...prev, newUser: newErrors }));
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateEditUser = () => {
+        const editErrors = {};
+        if (!validateEmail(editForm.email)) editErrors.email = "L'email doit être valide.";
+        if (!validatePassword(editForm.password)) editErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
+        setErrors((prev) => ({ ...prev, editForm: editErrors }));
+        return Object.keys(editErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateNewUser()) return;
+
         try {
             const addedUser = await postUser(newUser);
             setUsers((prevUsers) => [...prevUsers, addedUser]);
             setNewUser({ name: '', email: '', password: '' });
+            setErrors((prev) => ({ ...prev, newUser: {} }));
+            setTouched((prev) => ({ ...prev, newUser: {} }));
         } catch (error) {
-            console.error('Erreur lors de l\'ajout de l\'utilisateur :', error);
+            console.error("Erreur lors de l'ajout de l'utilisateur :", error);
         }
     };
 
     const startEditing = (user) => {
         setEditingUser(user.id);
-        setEditForm({
-            name: user.name,
-            email: user.email,
-            password: user.password,
-        });
+        setEditForm({ name: user.name, email: user.email, password: user.password });
+        setErrors((prev) => ({ ...prev, editForm: {} }));
+        setTouched((prev) => ({ ...prev, editForm: {} }));
     };
 
     const handleUpdateSubmit = async (userId) => {
+        if (!validateEditUser()) return;
+
         try {
             const updatedUser = await putUser(userId, editForm);
             setUsers((prevUsers) =>
-                prevUsers.map((user) =>
-                    user.id === userId ? updatedUser : user
-                )
+                prevUsers.map((user) => (user.id === userId ? updatedUser : user))
             );
             setEditingUser(null);
+            setErrors((prev) => ({ ...prev, editForm: {} }));
+            setTouched((prev) => ({ ...prev, editForm: {} }));
         } catch (error) {
-            console.error('Erreur lors de la modification de l\'utilisateur :', error);
+            console.error("Erreur lors de la modification de l'utilisateur :", error);
         }
     };
 
     const togglePasswordVisibility = (userId) => {
-        setVisiblePasswords(prev => ({
-            ...prev,
-            [userId]: !prev[userId]
-        }));
+        setVisiblePasswords((prev) => ({ ...prev, [userId]: !prev[userId] }));
     };
 
     if (loading) {
@@ -108,39 +163,60 @@ const Profile = () => {
                     {users.map((user) => (
                         <div className="user-card" key={user.id}>
                             {editingUser === user.id ? (
-                                <form onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleUpdateSubmit(user.id);
-                                }}>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={editForm.name}
-                                        onChange={handleEditInputChange}
-                                        required
-                                    />
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={editForm.email}
-                                        onChange={handleEditInputChange}
-                                        required
-                                    />
-                                    <div className="password-input-container">
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleUpdateSubmit(user.id);
+                                    }}
+                                    className="edit-form"
+                                >
+                                    <div className="form-group">
                                         <input
-                                            type={visiblePasswords[user.id] ? "text" : "password"}
-                                            name="password"
-                                            value={editForm.password}
+                                            type="text"
+                                            name="name"
+                                            value={editForm.name}
                                             onChange={handleEditInputChange}
                                             required
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() => togglePasswordVisibility(user.id)}
-                                            className="password-toggle-btn"
-                                        >
-                                            {visiblePasswords[user.id] ? <EyeOff size={20} /> : <Eye size={20} />}
-                                        </button>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="input-wrapper">
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                value={editForm.email}
+                                                onChange={handleEditInputChange}
+                                                onBlur={() => handleBlur('editForm', 'email')}
+                                                required
+                                            />
+                                            {touched.editForm?.email && errors.editForm?.email && (
+                                                <p className="error">{errors.editForm.email}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="input-wrapper">
+                                            <div className="password-input-container">
+                                                <input
+                                                    type={visiblePasswords[user.id] ? 'text' : 'password'}
+                                                    name="password"
+                                                    value={editForm.password}
+                                                    onChange={handleEditInputChange}
+                                                    onBlur={() => handleBlur('editForm', 'password')}
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => togglePasswordVisibility(user.id)}
+                                                    className="password-toggle-btn"
+                                                >
+                                                    {visiblePasswords[user.id] ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                </button>
+                                            </div>
+                                            {touched.editForm?.password && errors.editForm?.password && (
+                                                <p className="error">{errors.editForm.password}</p>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="button-group">
                                         <button type="submit">Sauvegarder</button>
@@ -176,31 +252,47 @@ const Profile = () => {
                 <div className="form-new-user">
                     <h2>Ajouter un utilisateur</h2>
                     <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Nom"
-                            value={newUser.name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={newUser.email}
-                            onChange={handleInputChange}
-                            required
-                        />
-                        <div className="password-input-container">
+                        <div className="form-group">
                             <input
-                                type="password"
-                                name="password"
-                                placeholder="Mot de passe"
-                                value={newUser.password}
+                                type="text"
+                                name="name"
+                                placeholder="Nom"
+                                value={newUser.name}
                                 onChange={handleInputChange}
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <div className="input-wrapper">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={newUser.email}
+                                    onChange={handleInputChange}
+                                    onBlur={() => handleBlur('newUser', 'email')}
+                                    required
+                                />
+                                {touched.newUser?.email && errors.newUser?.email && (
+                                    <p className="error">{errors.newUser.email}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <div className="input-wrapper">
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Mot de passe"
+                                    value={newUser.password}
+                                    onChange={handleInputChange}
+                                    onBlur={() => handleBlur('newUser', 'password')}
+                                    required
+                                />
+                                {touched.newUser?.password && errors.newUser?.password && (
+                                    <p className="error">{errors.newUser.password}</p>
+                                )}
+                            </div>
                         </div>
                         <button type="submit">Ajouter</button>
                     </form>

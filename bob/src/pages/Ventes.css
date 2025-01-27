@@ -137,10 +137,6 @@
     transition: box-shadow 0.3s ease;
 }
 
-.beer-card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .beer-card h2 {
     font-size: 1.25rem;
     font-weight: 600;
@@ -173,10 +169,6 @@
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.sell-button:hover:not(.disabled) {
-    background-color: var(--button-hover);
 }
 
 .sell-button.disabled {
