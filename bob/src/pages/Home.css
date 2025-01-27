@@ -130,15 +130,19 @@ button,
 }
 
 .statistiques {
-    background-color: #e3f2fd;
+    background-color: #b6d7ee;
 }
 
 .stockage {
-    background-color: #e8f5e9;
+    background-color: #c3ecc6;
 }
 
 .tresorerie {
-    background-color: #fff3e0;
+    background-color: #f5deba;
+}
+
+.ventes {
+    background-color: #dec0e3;
 }
 
 @media (min-width: 380px) {

@@ -41,6 +41,12 @@ function Home({ setPage }) {
                         <div className="section-image tresorerie"></div>
                         <span>TRÉSORERIE</span>
                     </button>
+                    <button
+                        className="section-button"
+                        onClick={() => navigate('/ventes')}
+                    >
+                        <div className="section-image ventes"></div>
+                        <span>VENTES</span></button>
                 </div>
 
             </main><img src="BOB.png" id="bob" alt="BOB" />
