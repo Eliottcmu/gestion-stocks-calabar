@@ -10,7 +10,7 @@ public class Score
     public string? Id { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string UserId { get; set; }
+    public required string UserId { get; set; }
 
     public int Points { get; set; }
 

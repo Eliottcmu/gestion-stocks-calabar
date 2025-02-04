@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 
 [Route("api/users")]
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly MongoDBService _mongoDBService;
@@ -16,68 +21,81 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
-    // GET: Retrieve all users
+    // GET: Retrieve all users (accès réservé aux administrateurs)
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         try
         {
             var users = await _mongoDBService
                 .GetCollection<User>("Users")
-                .Find(_ => true)
+                .Find(user => true)
                 .ToListAsync();
             return Ok(users);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving users");
-            return StatusCode(500, "Internal server error");
+            _logger.LogError(ex, "Erreur lors de la récupération des utilisateurs");
+            return StatusCode(500, "Erreur interne du serveur");
         }
     }
 
-    // POST: Add a new user
+    // POST: Add a new user (accès réservé aux administrateurs)
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<User>> PostUser(User user)
     {
         if (user == null || string.IsNullOrEmpty(user.name))
         {
-            return BadRequest("Invalid user data.");
+            return BadRequest("Données utilisateur invalides.");
         }
 
         var collection = _mongoDBService.GetCollection<User>("Users");
         await collection.InsertOneAsync(user);
 
-        return CreatedAtAction(nameof(GetUsers), new { id = user.id }, user);
+        // Retourne l'utilisateur créé via l'action GetUser (récupération par ID)
+        return CreatedAtAction(nameof(GetUser), new { id = user.id }, user);
     }
 
     // PUT: Update an existing user
-    [HttpPut("{id}")]
+    [HttpPut("{id:length(24)}")]
     public async Task<ActionResult<User>> PutUser(string id, User user)
     {
-        if (user == null || string.IsNullOrEmpty(id))
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var isAdmin = User.IsInRole("Admin");
+
+        // Les utilisateurs non-admin ne peuvent mettre à jour que leurs propres données
+        if (!isAdmin && userId != id)
         {
-            return BadRequest("Invalid user data.");
+            return Forbid();
         }
 
-        user.id = id; // Ensure the ID matches the route parameter
+        if (user == null || string.IsNullOrEmpty(id))
+        {
+            return BadRequest("Données utilisateur invalides.");
+        }
+
+        user.id = id; // S'assurer que l'ID correspond au paramètre de la route
         var collection = _mongoDBService.GetCollection<User>("Users");
         var result = await collection.ReplaceOneAsync(u => u.id == id, user);
 
         if (result.MatchedCount == 0)
         {
-            return NotFound("User not found");
+            return NotFound("Utilisateur non trouvé");
         }
 
         return Ok(user);
     }
 
-    // DELETE: Remove a user by ID
-    [HttpDelete("{id}")]
+    // DELETE: Remove a user by ID (accès réservé aux administrateurs)
+    [HttpDelete("{id:length(24)}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteUser(string id)
     {
         if (string.IsNullOrEmpty(id))
         {
-            return BadRequest("Invalid user ID.");
+            return BadRequest("ID utilisateur invalide.");
         }
 
         var collection = _mongoDBService.GetCollection<User>("Users");
@@ -85,19 +103,19 @@ public class UserController : ControllerBase
 
         if (result.DeletedCount == 0)
         {
-            return NotFound("User not found");
+            return NotFound("Utilisateur non trouvé");
         }
 
         return NoContent();
     }
 
     // GET: Retrieve a user by ID
-    [HttpGet("{id}")]
+    [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<User>> GetUser(string id)
     {
         if (string.IsNullOrEmpty(id))
         {
-            return BadRequest("Invalid user ID.");
+            return BadRequest("ID utilisateur invalide.");
         }
 
         var collection = _mongoDBService.GetCollection<User>("Users");
@@ -105,7 +123,7 @@ public class UserController : ControllerBase
 
         if (user == null)
         {
-            return NotFound("User not found");
+            return NotFound("Utilisateur non trouvé");
         }
 
         return Ok(user);
