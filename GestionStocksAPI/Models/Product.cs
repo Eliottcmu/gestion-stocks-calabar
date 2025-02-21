@@ -5,8 +5,8 @@ public enum ProduitType
 {
     Biere,
     Vin,
-    Cookie,
-    KinderBueno,
+    Gouter,
+    Miam,
 }
 
 public class Products

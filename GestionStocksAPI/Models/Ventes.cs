@@ -11,4 +11,5 @@ public class Ventes
     public int quantite { get; set; }
     public double montant { get; set; }
     public required string name { get; set; }
+    public required string typeReglement { get; set; }
 }
