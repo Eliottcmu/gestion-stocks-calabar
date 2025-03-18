@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "JchQzU8mAXutihDnEsw/XL1sYDWh4SduXOruTlMe7lA=",
+  "Source": "GestionStocksAPI",
+  "BasePath": "_content/GestionStocksAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
