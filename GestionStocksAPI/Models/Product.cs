@@ -7,6 +7,7 @@ public enum ProduitType
     Vin,
     Gouter,
     Miam,
+    Soft,
 }
 
 public class Products

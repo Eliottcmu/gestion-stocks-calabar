@@ -1869,11 +1869,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\eliot\\Desktop\\P2I\\Avancement\\gestion-stocks-calabar\\GestionStocksAPI\\GestionStocksAPI.csproj",
+      "projectUniqueName": "C:\\Users\\eliot\\Desktop\\P2I\\gestion-stocks-calabar\\GestionStocksAPI\\GestionStocksAPI.csproj",
       "projectName": "GestionStocksAPI",
-      "projectPath": "C:\\Users\\eliot\\Desktop\\P2I\\Avancement\\gestion-stocks-calabar\\GestionStocksAPI\\GestionStocksAPI.csproj",
+      "projectPath": "C:\\Users\\eliot\\Desktop\\P2I\\gestion-stocks-calabar\\GestionStocksAPI\\GestionStocksAPI.csproj",
       "packagesPath": "C:\\Users\\eliot\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\eliot\\Desktop\\P2I\\Avancement\\gestion-stocks-calabar\\GestionStocksAPI\\obj\\",
+      "outputPath": "C:\\Users\\eliot\\Desktop\\P2I\\gestion-stocks-calabar\\GestionStocksAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\eliot\\AppData\\Roaming\\NuGet\\NuGet.Config",

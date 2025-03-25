@@ -33,7 +33,7 @@ public class StocksController : ControllerBase
         public int quantity { get; set; }
 
         [Required(ErrorMessage = "Type is required")]
-        [RegularExpression("^(Biere|Vin|Gouter|Miam)$", ErrorMessage = "Invalid product type")]
+        [RegularExpression("^(Biere|Vin|Gouter|Miam|Soft)$", ErrorMessage = "Invalid product type")]
         public string type { get; set; }
     }
 
