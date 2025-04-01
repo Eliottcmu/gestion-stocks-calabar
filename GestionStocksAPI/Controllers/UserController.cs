@@ -128,4 +128,32 @@ public class UserController : ControllerBase
 
         return Ok(user);
     }
+
+    // POST: Inscription (accessible sans authentification)
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public async Task<ActionResult<User>> RegisterUser(User newUser)
+    {
+        if (
+            newUser == null
+            || string.IsNullOrEmpty(newUser.name)
+            || string.IsNullOrEmpty(newUser.password)
+            || string.IsNullOrEmpty(newUser.email)
+        )
+        {
+            return BadRequest("Nom, mot de passe et email sont requis.");
+        }
+
+        var collection = _mongoDBService.GetCollection<User>("Users");
+
+        // Vérification si username existe déjà
+        var existingUser = await collection.Find(u => u.name == newUser.name).FirstOrDefaultAsync();
+        if (existingUser != null)
+        {
+            return Conflict("Un utilisateur avec ce nom existe déjà.");
+        }
+
+        await collection.InsertOneAsync(newUser);
+        return CreatedAtAction(nameof(GetUser), new { id = newUser.id }, newUser);
+    }
 }
